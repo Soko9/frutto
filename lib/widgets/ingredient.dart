@@ -16,9 +16,13 @@ class Ingredient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-          model.icon,
-          color: model.color,
+    return Transform.flip(
+          flipX: index <= 4,
+          child: Image.asset(
+            model.image,
+            width: 52,
+            height: 52,
+          ),
         )
         .animate()
         .fadeIn(delay: 300.ms)

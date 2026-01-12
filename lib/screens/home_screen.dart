@@ -66,9 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
+          SizedBox.expand(
             child: PageView(
               controller: _controller,
               onPageChanged: (value) {
@@ -86,11 +86,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          Indicator(
-            next: next,
-            prev: prev,
-            length: ProductModel.products.length,
-            currentActiveIndex: _currentPage,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Indicator(
+              next: next,
+              prev: prev,
+              length: ProductModel.products.length,
+              currentActiveIndex: _currentPage,
+            ),
           ),
         ],
       ),

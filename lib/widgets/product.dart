@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frutto/common/extensions.dart';
 import 'package:frutto/models/product_model.dart';
 
@@ -19,10 +20,14 @@ class Product extends StatelessWidget {
           spacing: 12,
           mainAxisSize: .min,
           children: [
-            Container(
+            SvgPicture.asset(
+              model.image,
               width: 270,
               height: 415,
-              color: model.color,
+              colorFilter: ColorFilter.mode(
+                model.color,
+                BlendMode.srcATop,
+              ),
             ),
             Text(
               model.name,
@@ -38,9 +43,9 @@ class Product extends StatelessWidget {
           curve: Curves.easeOutBack,
         )
         .move(
-          begin: const Offset(0, -120),
+          begin: const Offset(0, -40),
           end: Offset.zero,
-          delay: 120.ms,
+          delay: 300.ms,
           duration: 250.ms,
         );
   }

@@ -52,29 +52,32 @@ class _ShowState extends State<Show> with SingleTickerProviderStateMixin {
         ? Constants.kIngredientsLength
         : widget.product.ingredients.length;
 
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        for (int i = 0; i < ingredientsLength; i++)
-          Positioned(
-            child: Ingredient(
-              index: i,
-              controller: _controller,
-              model: widget
-                  .product
-                  .ingredients[i % widget.product.ingredients.length]
-                  .copyWith(
-                    direction: jitter(
-                      Constants.kDirections[i],
+    return ColoredBox(
+      color: widget.product.color.withValues(alpha: 0.25),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          for (int i = 0; i < ingredientsLength; i++)
+            Positioned(
+              child: Ingredient(
+                index: i,
+                controller: _controller,
+                model: widget
+                    .product
+                    .ingredients[i % widget.product.ingredients.length]
+                    .copyWith(
+                      direction: jitter(
+                        Constants.kDirections[i],
+                      ),
                     ),
-                  ),
+              ),
             ),
+          Product(
+            model: widget.product,
+            controller: _controller,
           ),
-        Product(
-          model: widget.product,
-          controller: _controller,
-        ),
-      ],
+        ],
+      ),
     );
   }
 

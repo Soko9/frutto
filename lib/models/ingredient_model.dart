@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 class IngredientModel {
   const IngredientModel({
     required this.name,
-    required this.icon,
+    required this.image,
     required this.color,
     required this.direction,
   });
 
   final String name;
-  final IconData icon;
+  final String image;
   final Color color;
   final Offset direction;
 
   IngredientModel copyWith({Offset? direction}) => IngredientModel(
     name: name,
-    icon: icon,
+    image: image,
     color: color,
     direction: direction ?? this.direction,
   );
