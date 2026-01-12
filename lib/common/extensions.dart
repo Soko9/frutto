@@ -5,4 +5,5 @@ extension ContextX on BuildContext {
   double get sw => MediaQuery.sizeOf(this).width;
 
   TextTheme get textTheme => Theme.of(this).textTheme;
+  ColorScheme get colorScheme => Theme.of(this).colorScheme;
 }

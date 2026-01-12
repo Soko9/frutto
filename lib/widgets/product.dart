@@ -1,47 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:frutto/common/extensions.dart';
-import 'package:frutto/widgets/ingredient.dart';
-
-class ProductModel {
-  const ProductModel({
-    required this.name,
-    required this.color,
-    required this.ingredients,
-    required this.width,
-    required this.height,
-  });
-
-  final String name;
-  final Color color;
-  final List<IngredientModel> ingredients;
-  final double width;
-  final double height;
-}
+import 'package:frutto/models/product_model.dart';
 
 class Product extends StatelessWidget {
   const Product({
+    required this.controller,
     required this.model,
     super.key,
   });
 
+  final AnimationController controller;
   final ProductModel model;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 12,
-      mainAxisSize: .min,
-      children: [
-        Container(
-          height: model.height, //context.sh * 0.7
-          width: model.width, //context.sw * 0.25,
-          color: model.color,
-        ),
-        Text(
-          model.name,
-          style: context.textTheme.displayLarge,
-        ),
-      ],
-    );
+          spacing: 12,
+          mainAxisSize: .min,
+          children: [
+            Container(
+              width: 270,
+              height: 415,
+              color: model.color,
+            ),
+            Text(
+              model.name,
+              style: context.textTheme.displayLarge,
+            ),
+          ],
+        )
+        .animate(controller: controller)
+        .scale(
+          begin: const Offset(0.3, 0.3),
+          end: const Offset(1, 1),
+          duration: 300.ms,
+          curve: Curves.easeOutBack,
+        )
+        .move(
+          begin: const Offset(0, -120),
+          end: Offset.zero,
+          delay: 120.ms,
+          duration: 250.ms,
+        );
   }
 }

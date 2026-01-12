@@ -1,83 +1,89 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:frutto/common/extensions.dart';
+import 'package:frutto/common/constants.dart';
+import 'package:frutto/models/product_model.dart';
 import 'package:frutto/widgets/ingredient.dart';
 import 'package:frutto/widgets/product.dart';
 
-class Show extends StatelessWidget {
+class Show extends StatefulWidget {
   const Show({
+    required this.isActive,
     required this.product,
     super.key,
   });
 
+  final bool isActive;
   final ProductModel product;
 
   @override
+  State<Show> createState() => _ShowState();
+}
+
+class _ShowState extends State<Show> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void didUpdateWidget(covariant Show oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.isActive && !oldWidget.isActive) {
+      unawaited(_controller.forward(from: 0));
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    const minSize = 0.5;
-    const maxSize = 2.5;
-    const minAngle = -math.pi / 3;
-    const maxAngle = math.pi / 3;
-    final minDistance = (-product.width * 1.75, -product.height * 0.25);
-    final maxDistance = (product.width * 1.75, 0.0);
-    const maxCount = 6;
+    final ingredientsLength =
+        widget.product.ingredients.length <= Constants.kIngredientsLength ~/ 2
+        ? Constants.kIngredientsLength
+        : widget.product.ingredients.length;
 
-    final count = product.ingredients.length >= 4
-        ? product.ingredients.length
-        : maxCount;
-
-    return Container(
-      width: context.sw,
-      height: context.sh,
+    return Stack(
       alignment: Alignment.center,
-      child: Stack(
-        alignment: Alignment.center,
-        fit: StackFit.passthrough,
-        children: [
-          Product(model: product),
-          for (int i = 0; i < count; i++)
-            Transform.translate(
-              offset: Offset(
-                _getRandomValue(minDistance.$1, maxDistance.$1),
-                _getRandomValue(minDistance.$2, maxDistance.$2),
-              ),
-              child: Transform.rotate(
-                angle: _getRandomValue(minAngle, maxAngle),
-                child: Transform.scale(
-                  scale: _getRandomValue(minSize, maxSize),
-                  child: Ingredient(
-                    model: count == maxCount
-                        ? product.ingredients[i % 3]
-                        : product.ingredients[i],
+      children: [
+        for (int i = 0; i < ingredientsLength; i++)
+          Positioned(
+            child: Ingredient(
+              index: i,
+              controller: _controller,
+              model: widget
+                  .product
+                  .ingredients[i % widget.product.ingredients.length]
+                  .copyWith(
+                    direction: jitter(
+                      Constants.kDirections[i],
+                    ),
                   ),
-                ),
-              ),
             ),
-          for (int i = 0; i < count; i++)
-            Transform.translate(
-              offset: Offset(
-                _getRandomValue(minDistance.$1, maxDistance.$1),
-                _getRandomValue(minDistance.$2, maxDistance.$2),
-              ),
-              child: Transform.rotate(
-                angle: _getRandomValue(minAngle, maxAngle),
-                child: Transform.scale(
-                  scale: _getRandomValue(minSize, maxSize),
-                  child: Ingredient(
-                    model: count == maxCount
-                        ? product.ingredients[i % 3]
-                        : product.ingredients[i],
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+          ),
+        Product(
+          model: widget.product,
+          controller: _controller,
+        ),
+      ],
     );
   }
 
-  double _getRandomValue(double min, double max) {
-    return min + (math.Random().nextDouble() * (max - min));
+  Offset jitter(Offset base) {
+    final rand = math.Random();
+    return base +
+        Offset(
+          (rand.nextDouble() - 0.5) * 0.15,
+          (rand.nextDouble() - 0.5) * 0.15,
+        );
   }
 }

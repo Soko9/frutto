@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frutto/widgets/ingredient.dart';
-import 'package:frutto/widgets/product.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:frutto/models/product_model.dart';
+import 'package:frutto/widgets/indicator.dart';
 import 'package:frutto/widgets/show.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,45 +11,19 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-final List<ProductModel> products = [];
-
 class _HomeScreenState extends State<HomeScreen> {
   late final PageController _controller;
 
-  final ProductModel _product = const ProductModel(
-    name: 'مربى الفراولة',
-    color: Colors.red,
-    width: 270,
-    height: 415,
-    ingredients: [
-      IngredientModel(
-        name: 'chocolate',
-        icon: Icons.cookie,
-        color: Colors.brown,
-      ),
-      IngredientModel(
-        name: 'avocado',
-        icon: Icons.egg_alt,
-        color: Colors.lightGreen,
-      ),
-      IngredientModel(
-        name: 'strawberry',
-        icon: Icons.bakery_dining_sharp,
-        color: Colors.red,
-      ),
-      // IngredientModel(
-      //   name: 'avocado',
-      //   icon: Icons.egg_alt,
-      //   color: Colors.lightGreen,
-      // ),
-    ],
-  );
+  int _currentPage = 0;
+
+  final Duration _transitionDuration = 250.ms;
+  final Cubic _transitionCurve = Curves.ease;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(
-      initialPage: products.length ~/ 2,
+      initialPage: _currentPage,
     );
   }
 
@@ -58,12 +33,66 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  Future<void> next() async {
+    if (_controller.page?.toInt() == ProductModel.products.length - 1) {
+      await _controller.animateToPage(
+        0,
+        duration: _transitionDuration * (ProductModel.products.length - 1),
+        curve: _transitionCurve,
+      );
+      return;
+    }
+    await _controller.nextPage(
+      duration: _transitionDuration,
+      curve: _transitionCurve,
+    );
+  }
+
+  Future<void> prev() async {
+    if (_controller.page?.toInt() == 0) {
+      await _controller.animateToPage(
+        ProductModel.products.length - 1,
+        duration: _transitionDuration * (ProductModel.products.length - 1),
+        curve: _transitionCurve,
+      );
+      return;
+    }
+    await _controller.previousPage(
+      duration: _transitionDuration,
+      curve: _transitionCurve,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _controller,
-        children: [Show(product: _product)],
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView(
+              controller: _controller,
+              onPageChanged: (value) {
+                setState(() {
+                  _currentPage = value;
+                });
+              },
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                for (int i = 0; i < ProductModel.products.length; i++)
+                  Show(
+                    product: ProductModel.products[i],
+                    isActive: _currentPage == i,
+                  ),
+              ],
+            ),
+          ),
+          Indicator(
+            next: next,
+            prev: prev,
+            length: ProductModel.products.length,
+            currentActiveIndex: _currentPage,
+          ),
+        ],
       ),
     );
   }
